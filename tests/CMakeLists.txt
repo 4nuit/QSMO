@@ -1,0 +1,248 @@
+enable_testing()
+set(COMMON_SRC ../src/kernels.cpp) # ../src/blochSphere.cpp
+
+set(SRC_H ${COMMON_SRC} h.cpp)
+set(SRC_X ${COMMON_SRC} x.cpp)
+set(SRC_Y ${COMMON_SRC} y.cpp)
+set(SRC_Z ${COMMON_SRC} z.cpp)
+set(SRC_RX ${COMMON_SRC} rx.cpp)
+set(SRC_RY ${COMMON_SRC} ry.cpp)
+set(SRC_RZ ${COMMON_SRC} rz.cpp)
+set(SRC_CNOT ${COMMON_SRC} cnot.cpp)
+set(SRC_SWAP ${COMMON_SRC} swap.cpp)
+set(SRC_CCNOT ${COMMON_SRC} ccnot.cpp)
+set(SRC_CCZ ${COMMON_SRC} ccflip.cpp)
+set(SRC_SpXA ${COMMON_SRC} sparse_x_all.cpp)
+
+include_directories(${USER_INCLUDE_PATHS})
+link_directories(${USER_LIB_PATHS})
+link_libraries(${USER_LIBS})
+
+message(STATUS "Including USER_FLAGS, USER_LIB_PATHS, USER_LIBS for tests")
+find_package(GTest REQUIRED)
+set(GTEST_FLAGS GTest::GTest GTest::Main)
+
+set(CPU_COMPILE_FLAGS -DCPU -v -fsycl -lm -Wall ${WIN_FLAG} ${DEBUG_FLAGS} ${USER_FLAGS})
+set(CPU_LINK_FLAGS -v -fsycl ${USER_FLAGS} ${GTEST_FLAGS} onemath_blas_mklcpu onemath_sparse_blas_mklcpu)
+
+set(GPU_COMPILE_FLAGS -DGPU -v -fsycl -fsycl-targets=nvptx64-nvidia-cuda -Xsycl-target-backend "--cuda-gpu-arch=sm_80" -Wall ${WIN_FLAG} ${DEBUG_FLAGS} ${QACTYPES} ${USER_FLAGS})
+set(GPU_LINK_FLAGS -v -fsycl -fsycl-targets=nvptx64-nvidia-cuda -fsycl-rdc -Xsycl-target-backend "--cuda-gpu-arch=sm_80" ${QACTYPES} ${USER_FLAGS} ${GTEST_FLAGS} onemath_blas_cublas onemath_sparse_blas_cusparse)
+
+set(EMULATOR_COMPILE_FLAGS -DFPGA_EMULATOR -v -fsycl -fintelfpga -Wall ${WIN_FLAG} ${DEBUG_FLAGS} ${USER_FLAGS})
+set(EMULATOR_LINK_FLAGS -v -fsycl  -fintelfpga ${USER_FLAGS} ${GTEST_FLAGS} onemath_blas_generic)
+
+#### CPU TESTS
+
+add_executable(cpu_h ${SRC_H})
+add_test(NAME cpu_h COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_h)
+target_compile_options(cpu_h PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_h PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_h PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_x ${SRC_X})
+add_test(NAME cpu_x COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_x)
+target_compile_options(cpu_x PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_x PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_x PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_y ${SRC_Y})
+add_test(NAME cpu_y COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_y)
+target_compile_options(cpu_y PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_y PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_y PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_z ${SRC_Z})
+add_test(NAME cpu_z COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_z)
+target_compile_options(cpu_z PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_z PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_z PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_rx ${SRC_RX})
+add_test(NAME cpu_rx COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_rx)
+target_compile_options(cpu_rx PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_rx PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_rx PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_ry ${SRC_RY})
+add_test(NAME cpu_ry COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_ry)
+target_compile_options(cpu_ry PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_ry PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_ry PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_rz ${SRC_RZ})
+add_test(NAME cpu_rz COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_rz)
+target_compile_options(cpu_rz PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_rz PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_rz PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_cnot ${SRC_CNOT})
+add_test(NAME cpu_cnot COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_cnot)
+target_compile_options(cpu_cnot PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_cnot PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_cnot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_swap ${SRC_SWAP})
+add_test(NAME cpu_swap COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_swap)
+target_compile_options(cpu_swap PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_swap PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_swap PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_ccnot ${SRC_CCNOT})
+add_test(NAME cpu_ccnot COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_ccnot)
+target_compile_options(cpu_ccnot PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_ccnot PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_ccnot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_ccflip ${SRC_CCZ})
+add_test(NAME cpu_ccflip COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_ccflip)
+target_compile_options(cpu_ccflip PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_ccflip PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_ccflip PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(cpu_spxa ${SRC_SpXA})
+add_test(NAME cpu_spxa COMMAND ${CMAKE_BINARY_DIR}/tests/cpu_spxa)
+target_compile_options(cpu_spxa PRIVATE ${CPU_COMPILE_FLAGS})
+target_link_libraries(cpu_spxa PRIVATE ${CPU_LINK_FLAGS})
+set_target_properties(cpu_spxa PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+#### GPU TESTS
+
+add_executable(gpu_h ${SRC_H})
+add_test(NAME gpu_h COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_h)
+target_compile_options(gpu_h PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_h PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_h PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_x ${SRC_X})
+add_test(NAME gpu_x COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_x)
+target_compile_options(gpu_x PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_x PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_x PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_y ${SRC_Y})
+add_test(NAME gpu_y COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_y)
+target_compile_options(gpu_y PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_y PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_y PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_z ${SRC_Z})
+add_test(NAME gpu_z COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_z)
+target_compile_options(gpu_z PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_z PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_z PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_rx ${SRC_RX})
+add_test(NAME gpu_rx COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_rx)
+target_compile_options(gpu_rx PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_rx PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_rx PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_ry ${SRC_RY})
+add_test(NAME gpu_ry COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_ry)
+target_compile_options(gpu_ry PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_ry PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_ry PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_rz ${SRC_RZ})
+add_test(NAME gpu_rz COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_rz)
+target_compile_options(gpu_rz PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_rz PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_rz PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_cnot ${SRC_CNOT})
+add_test(NAME gpu_cnot COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_cnot)
+target_compile_options(gpu_cnot PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_cnot PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_cnot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_swap ${SRC_SWAP})
+add_test(NAME gpu_swap COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_swap)
+target_compile_options(gpu_swap PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_swap PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_swap PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_ccnot ${SRC_CCNOT})
+add_test(NAME gpu_ccnot COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_ccnot)
+target_compile_options(gpu_ccnot PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_ccnot PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_ccnot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_ccflip ${SRC_CCZ})
+add_test(NAME gpu_ccflip COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_ccflip)
+target_compile_options(gpu_ccflip PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_ccflip PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_ccflip PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(gpu_spxa ${SRC_SpXA})
+add_test(NAME gpu_spxa COMMAND ${CMAKE_BINARY_DIR}/tests/gpu_spxa)
+target_compile_options(gpu_spxa PRIVATE ${GPU_COMPILE_FLAGS})
+target_link_libraries(gpu_spxa PRIVATE ${GPU_LINK_FLAGS})
+set_target_properties(gpu_spxa PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+#### FPGA EMULATOR TESTS
+
+add_executable(fpga_emu_h ${SRC_H})
+add_test(NAME fpga_emu_h COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_h)
+target_compile_options(fpga_emu_h PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_h PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_h PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_x ${SRC_X})
+add_test(NAME fpga_emu_x COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_x)
+target_compile_options(fpga_emu_x PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_x PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_x PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_y ${SRC_Y})
+add_test(NAME fpga_emu_y COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_y)
+target_compile_options(fpga_emu_y PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_y PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_y PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_z ${SRC_Z})
+add_test(NAME fpga_emu_z COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_z)
+target_compile_options(fpga_emu_z PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_z PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_z PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_rx ${SRC_RX})
+add_test(NAME fpga_emu_rx COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_rx)
+target_compile_options(fpga_emu_rx PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_rx PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_rx PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_ry ${SRC_RY})
+add_test(NAME fpga_emu_ry COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_ry)
+target_compile_options(fpga_emu_ry PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_ry PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_ry PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_rz ${SRC_RZ})
+add_test(NAME fpga_emu_rz COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_rz)
+target_compile_options(fpga_emu_rz PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_rz PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_rz PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_cnot ${SRC_CNOT})
+add_test(NAME fpga_emu_cnot COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_cnot)
+target_compile_options(fpga_emu_cnot PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_cnot PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_cnot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_swap ${SRC_SWAP})
+add_test(NAME fpga_emu_swap COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_swap)
+target_compile_options(fpga_emu_swap PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_swap PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_swap PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_ccnot ${SRC_CCNOT})
+add_test(NAME fpga_emu_ccnot COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_ccnot)
+target_compile_options(fpga_emu_ccnot PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_ccnot PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_ccnot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+
+add_executable(fpga_emu_ccflip ${SRC_CCZ})
+add_test(NAME fpga_emu_ccflip COMMAND ${CMAKE_BINARY_DIR}/tests/fpga_emu_ccflip)
+target_compile_options(fpga_emu_ccflip PRIVATE ${FPGA_COMPILE_FLAGS})
+target_link_libraries(fpga_emu_ccflip PRIVATE ${FPGA_LINK_FLAGS})
+set_target_properties(fpga_emu_ccflip PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
