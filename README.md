@@ -1,6 +1,6 @@
 ## QSMO
 
-SYCL-based quantum simulator using sparse matrices and qubit wise multiplication for gate computation
+SYCL-based quantum simulator using sparse matrices and qubit wise multiplication for gate computation with Intel OneAPI.
 
 - **SpMV** kernels: see [oneapi/math/sparse_bkas/types.hpp](https://github.com/uxlfoundation/oneMath/blob/develop/include/oneapi/math/sparse_blas/types.hpp). **COO** format and **default_alg** with **sorted_by_rows** are used here (*symmetric* is not yet implemented for cuBlas, other algos such as **coo_alg1** could be used).
 
@@ -34,18 +34,24 @@ See https://github.com/LuxProvide/QuantumFPGA for further details.
 - https://www.itensor.org/
 - https://github.com/cda-tum/mqt-core
 
-## Dependancies (+Local installation of 1API)
+## Dependencies (+Local installation of 1API)
 
 - https://www.intel.com/content/www/us/en/developer/articles/containers/oneapi-base-toolkit.html
 - https://www.intel.com/content/www/us/en/developer/tools/oneapi/fpga-download.html?operatingsystem=linux&linux-install=offline
 - https://www.intel.com/content/www/us/en/docs/oneapi/programming-guide/2024-2/use-the-setvars-and-oneapi-vars-scripts-with-linux.html
 
 ```bash
+docker pull intel/oneapi-basekit:latest
+```
+
+```bash
+# In the OneAPI docker container
+
 echo -ne ". /opt/intel/oneapi/setvars.sh --force\n. /opt/intel/oneapi/2025.0/oneapi-vars.sh  --force" >> .bashrc && source ~/.bashrc
 apt update && apt install libgtest-dev #googletest freeglut3-dev
 ```
 
-**Celerity (SYCL-MPI)** => Re-implement kernels
+**Celerity (SYCL-MPI)** => TODO Re-implement kernels
 
 ```bash
 module load intel-compilers/2024.2.0
@@ -73,11 +79,11 @@ cmake --build build -j$(nproc) --target install
 
 **GoogleTest**
 
-**oneMath** => Tofix for Tensors
+**oneMath**
 
 - https://uxlfoundation.github.io/oneMath/using_onemath_with_cmake.html
 
-**MQTCore**  => Will not be used
+**MQTCore**  => Will not be used. TODO => ZX optimisation before gate computing
 
 - https://mqt.readthedocs.io/projects/core/en/latest/installation.html#integrating-mqt-core-into-your-project
 
